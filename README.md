@@ -143,47 +143,59 @@ coy/
 - **Node.js**: `v20.x` or `v22.x` (LTS recommended)
 - **npm**: `v10.x` or higher (bundled with Node.js)
 
-### Installation
+### Quick Start (One-Command Setup)
 
-Clone the repository and install dependencies:
+For a quick setup on a freshly cloned repository:
 
 ```bash
 git clone <repository-url>
 cd coy
 npm install
-```
-
-### Environment Setup
-
-Create a `.env` file from `.env.example`:
-
-```bash
 cp .env.example .env
+npm run setup
+npm run dev
 ```
 
-Ensure your `.env` contains the SQLite database path:
+The app will be live at `http://localhost:3000`.
 
-```env
-DATABASE_URL="file:./dev.db"
-```
+---
 
-### Database Setup & Seeding
+### Step-by-Step Setup
 
-1. Generate the Prisma Client:
+If you prefer to run each setup step individually:
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   ```
+   *(Uses `DATABASE_URL="file:./dev.db"` by default).*
+
+3. **Generate Prisma Client:**
    ```bash
    npx prisma generate
    ```
 
-2. Run database migrations to apply the schema:
+4. **Apply database migrations:**
    ```bash
-   npx prisma migrate dev --name init
+   npx prisma migrate deploy
    ```
+   *(Applies all committed migrations to create the SQLite database schema).*
 
-3. Seed the database with 32 realistic mock student profiles:
+5. **Seed candidate profiles:**
    ```bash
    npm run db:seed
    ```
-   *(Note: The seed script is idempotent; running it multiple times safely updates or creates missing profiles without creating duplicates).*
+   *(Seeds 32 realistic mock student profiles; idempotent and safe to run multiple times).*
+
+6. **Start development server:**
+   ```bash
+   npm run dev
+   ```
 
 ---
 
@@ -191,6 +203,7 @@ DATABASE_URL="file:./dev.db"
 
 | Command | Description |
 |---------|-------------|
+| `npm run setup` | One-command setup: generates Prisma client, deploys migrations, and seeds 32 mock profiles |
 | `npm run dev` | Starts the Next.js development server with Turbopack on `http://localhost:3000` |
 | `npm run build` | Builds an optimized production bundle (`next build`) |
 | `npm run start` | Runs the compiled production server (`next start`) |
@@ -359,6 +372,44 @@ Returns confirmed mutual matches ordered chronologically by match date (`matched
    All client components communicate strictly via Next.js REST API route handlers. The Prisma client is never imported into client-side code.
 4. **Environment Isolation:**
    Local SQLite databases (`*.db`, `*.db-journal`, `*.db-wal`) and `.env` files are strictly excluded from version control via `.gitignore`. A safe `.env.example` template is provided for onboarding.
+
+---
+
+## Evaluator Verification Guide
+
+### 1. Interactive UI Testing
+
+| Area | Action | Expected Behavior |
+|------|--------|-------------------|
+| **Discover Feed** | Open `http://localhost:3000` | Displays candidate profile card with portrait photo, name, age, college, bio, and interest chips. |
+| **Swipe Gestures** | Drag card right (>90px) or left (<-90px) | Shows dynamic emerald `LIKE` or rose `PASS` stamp badge with proportional opacity. Card animates off-screen on release. |
+| **Button & Keyboard Controls** | Click ✖ or ♥ buttons, or press <kbd>←</kbd> / <kbd>→</kbd> | Advances to next candidate profile only after API confirms swipe persistence. |
+| **Mutual Match Celebration** | Swipe LIKE on candidates who liked you back *(e.g. Maya Lin, Sophia Rodriguez)* | Opens animated **"It's a Match!"** modal with matched profile avatar and quick actions. |
+| **Matches Gallery** | Click **Matches** tab on bottom navigation | Shows confirmed mutual matches in a 2-column grid with relative match dates (*"Today"*, *"Yesterday"*). Badge reflects live match count. |
+| **Profile Detail Inspection** | Click any card in the Matches grid | Opens accessible detail modal with full portrait photo, bio, college, city, and interest tags. Scrollable with sticky "Done" button. |
+| **Empty States** | Swipe through all profiles or click `[⚡ Test Empty]` in Matches | Friendly empty states render with honest refresh / Discover shortcuts. |
+
+### 2. API Endpoint Testing
+
+Both root routes (`/feed`, `/swipe`, `/matches`) and `/api/*` routes are fully functional:
+
+```bash
+# Test Feed (returns unswiped candidates, strips likedCurrentUser)
+curl http://localhost:3000/feed
+curl http://localhost:3000/api/feed
+
+# Test Swiping (records swipe, evaluates mutual match atomically)
+curl -X POST http://localhost:3000/swipe \
+  -H "Content-Type: application/json" \
+  -d '{"profileId":"prof_001","direction":"LIKE"}'
+
+# Test Matches (returns confirmed mutual connections)
+curl http://localhost:3000/matches
+curl http://localhost:3000/api/matches
+
+# Test Non-Destructive Empty Matches State
+curl "http://localhost:3000/matches?mock=empty"
+```
 
 ---
 

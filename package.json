@@ -9,6 +9,7 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "db:seed": "prisma db seed"
   },
   "dependencies": {
@@ -29,8 +30,5 @@
     "prisma": "^6.19.3",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
-  },
-  "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
   }
 }

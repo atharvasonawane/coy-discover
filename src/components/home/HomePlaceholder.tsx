@@ -24,7 +24,7 @@ export function HomePlaceholder({ onGoToDiscover }: HomePlaceholderProps) {
         <button
           type="button"
           onClick={onGoToDiscover}
-          className="inline-flex items-center gap-2 py-3 px-6 rounded-full font-semibold text-sm bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md hover:shadow-lg hover:from-rose-600 hover:to-pink-600 active:scale-95 transition-all"
+          className="inline-flex items-center gap-2 py-3 px-6 rounded-full font-semibold text-sm bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md hover:shadow-lg hover:from-rose-600 hover:to-pink-600 active:scale-95 transition-all cursor-pointer"
         >
           <span>Start Swiping</span>
           <span>🔥</span>

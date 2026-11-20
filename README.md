@@ -33,6 +33,12 @@ Coy provides college students with a delightful, privacy-centric way to discover
 
 ## Key Features
 
+- **Navigation Architecture:**
+  - 3-tab navigation layout: **Home**, **Discover** (default active), and **Matches**.
+  - The **Home** tab features a welcoming campus community introduction with a one-click "Start Swiping 🔥" shortcut directly into Discover.
+  - The **Discover** tab contains the full interactive card stack and swipe controls.
+  - The **Matches** tab contains the confirmed mutual connections gallery.
+
 - **Mobile-First Discover Interface:**
   - Card deck with smooth touch swipe and mouse drag gesture physics.
   - Dynamic LIKE / PASS visual stamp badges with proportional opacity.
@@ -89,6 +95,9 @@ coy/
 │   │   │   ├── feed/route.ts       # GET /api/feed (unswiped candidates)
 │   │   │   ├── swipe/route.ts      # POST /api/swipe (atomic swipe + match)
 │   │   │   └── matches/route.ts    # GET /api/matches (confirmed connections)
+│   │   ├── feed/route.ts           # GET /feed (route alias to /api/feed)
+│   │   ├── swipe/route.ts          # POST /swipe (route alias to /api/swipe)
+│   │   ├── matches/route.ts        # GET /matches (route alias to /api/matches)
 │   │   ├── favicon.ico
 │   │   ├── globals.css        # Tailwind v4 theme and global styles
 │   │   ├── layout.tsx         # Root layout with viewport configuration
@@ -103,7 +112,7 @@ coy/
 │   │   │   ├── ProfileCard.tsx     # Visual profile card & stamp badges
 │   │   │   └── SkeletonCard.tsx    # Feed loading placeholder
 │   │   ├── home/
-│   │   │   └── HomePlaceholder.tsx # Welcome home screen
+│   │   │   └── HomePlaceholder.tsx # Welcome home screen with Discover shortcut
 │   │   └── matches/
 │   │       ├── MatchCard.tsx       # Grid match card with relative date
 │   │       ├── MatchDetailModal.tsx # Full profile inspection dialog
@@ -194,12 +203,14 @@ DATABASE_URL="file:./dev.db"
 
 ## API Documentation
 
-### 1. GET `/api/feed`
+The backend endpoints are accessible both at the root paths specified by the assignment (`/feed`, `/swipe`, `/matches`) and at standard Next.js paths (`/api/feed`, `/api/swipe`, `/api/matches`).
+
+### 1. GET `/feed` or `/api/feed`
 
 Retrieves candidate profiles that the current user has not yet swiped on.
 
 - **Method:** `GET`
-- **URL:** `/api/feed`
+- **URL:** `/feed` or `/api/feed`
 - **Query Parameters:** None
 - **Response Headers:** `Content-Type: application/json`
 
@@ -226,12 +237,12 @@ Retrieves candidate profiles that the current user has not yet swiped on.
 
 ---
 
-### 2. POST `/api/swipe`
+### 2. POST `/swipe` or `/api/swipe`
 
 Records a user's swipe action (`LIKE` or `PASS`) on a candidate profile. Evaluates mutual matches atomically within a database transaction.
 
 - **Method:** `POST`
-- **URL:** `/api/swipe`
+- **URL:** `/swipe` or `/api/swipe`
 - **Request Headers:** `Content-Type: application/json`
 
 #### Request Payload
@@ -300,12 +311,12 @@ Records a user's swipe action (`LIKE` or `PASS`) on a candidate profile. Evaluat
 
 ---
 
-### 3. GET `/api/matches`
+### 3. GET `/matches` or `/api/matches`
 
 Returns confirmed mutual matches ordered chronologically by match date (`matchedAt DESC`).
 
 - **Method:** `GET`
-- **URL:** `/api/matches`
+- **URL:** `/matches` or `/api/matches`
 - **Query Parameters:**
   - `mock=empty` *(optional, development/testing)*: Returns `[]` to test empty state without modifying the database.
 

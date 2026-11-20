@@ -1,9 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { MatchRecord, parseInterests } from "@/types/api";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Preview/testing option to verify empty state without modifying the SQLite database
+  const mockParam = req.nextUrl.searchParams.get("mock");
+  if (mockParam === "empty") {
+    return NextResponse.json([], { status: 200 });
+  }
+
   try {
+
     const matches = await prisma.match.findMany({
       orderBy: {
         matchedAt: "desc",

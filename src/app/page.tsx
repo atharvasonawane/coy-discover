@@ -12,7 +12,7 @@ import { SkeletonCard } from "@/components/discover/SkeletonCard";
 import { EmptyState } from "@/components/discover/EmptyState";
 import { MatchModal } from "@/components/discover/MatchModal";
 import { HomePlaceholder } from "@/components/home/HomePlaceholder";
-import { MatchesPlaceholder } from "@/components/matches/MatchesPlaceholder";
+import { MatchesScreen } from "@/components/matches/MatchesScreen";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("discover");
@@ -193,11 +193,11 @@ export default function Home() {
           </div>
         )}
 
-        {/* Tab 3: Matches Placeholder */}
+        {/* Tab 3: Matches Screen (Core Milestone 4 Experience) */}
         {activeTab === "matches" && (
-          <MatchesPlaceholder
-            matchCount={matchCount}
+          <MatchesScreen
             onGoToDiscover={() => handleTabChange("discover")}
+            onMatchCountChange={(count) => setMatchCount(count)}
           />
         )}
       </main>

@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id               String   @id @default(uuid())
+  name             String
+  age              Int
+  photoUrl         String
+  bio              String
+  city             String
+  college          String
+  interests        String   // Serialized JSON array of interest strings, e.g. '["Photography", "Hiking"]'
+  likedCurrentUser Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  swipe            Swipe?
+  match            Match?
+
+  @@index([city])
+  @@index([college])
+  @@index([createdAt])
+}
+
+model Swipe {
+  id        String   @id @default(uuid())
+  profileId String   @unique
+  direction String   // 'LIKE' or 'PASS'
+  createdAt DateTime @default(now())
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([direction])
+  @@index([createdAt])
+}
+
+model Match {
+  id        String   @id @default(uuid())
+  profileId String   @unique
+  matchedAt DateTime @default(now())
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([matchedAt])
+}
